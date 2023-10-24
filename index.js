@@ -45,32 +45,7 @@ app.put('/book', (req, res) => {
 
 
 
-app.post('/reserve', async (req, res) => {
-    const { seatNumbers } = req.body;
 
-    if (!seatNumbers || !Array.isArray(seatNumbers)) {
-        return res.status(400).json({ error: 'Invalid request format' });
-    }
-
-    try {
-        // Check seat availability
-        const reservedSeats = await SeatReservation.find({ seatNumber: { $in: seatNumbers }, isReserved: false });
-
-        if (reservedSeats.length > 0) {
-            return res.status(400).json({ error: 'Some of the requested seats are already reserved' });
-        }
-
-        // Reserve the seats
-        await SeatReservation.updateMany(
-            { seatNumber: { $in: seatNumbers } },
-            { $set: { isReserved: true } }
-        );
-
-        res.json({ message: 'Seats reserved successfully' });
-    } catch (error) {
-        res.status(500).json({ error: 'Server error' });
-    }
-});
 
 app.post('/bookMultiple', async (req, res) => {
     const { numSeats } = req.body;
@@ -165,8 +140,6 @@ app.get('/seats', (req, res) => {
         });
 })
 
-
-// Implement the logic to handle seat reservations here
 
 
 app.listen(port, () => {
