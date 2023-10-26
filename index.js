@@ -4,10 +4,45 @@ const cors = require('cors')
 const app = express();
 const port = 3001;
 
-mongoose.connect('mongodb://localhost:27017/seat_reservation_db', {
+// const { MongoClient }=require( 'mongodb');
+// const records = Array.from({ length: 80 }, (_, i) => ({
+//     seatNumber: i + 1,
+//     isReserved: false,
+//   }));
+  
+//   // Function to insert records
+//   async function insertRecords() {
+//     const client = new MongoClient("mongodb+srv://herumbn:herumb123@cluster0.ooacs0a.mongodb.net/?retryWrites=true&w=majority", { useUnifiedTopology: true });
+  
+//     try {
+//       await client.connect();
+  
+//       const database = client.db("test"); // Replace with your database name
+//       const collection = database.collection("seatreservations"); // Replace with your collection name
+  
+//       const result = await collection.insertMany(records);
+//       console.log(`${result.insertedCount} records inserted.`);
+//     } finally {
+//       client.close();
+//     }
+//   }
+  
+//   // Call the insertRecords function
+//   insertRecords().catch(console.error);
+
+mongoose.connect('mongodb+srv://herumbn:herumb123@cluster0.ooacs0a.mongodb.net/?retryWrites=true&w=majority', {
     useNewUrlParser: true,
     useUnifiedTopology: true
-});
+})
+    .then((connected) => {
+        app.listen(port, () => {
+            console.log(`Server is running on port ${port} and connected to db`);
+        })
+
+
+    }).catch((err) => {
+        throw err
+    })
 
 const SeatReservation = mongoose.model('SeatReservation', {
     seatNumber: Number,
@@ -21,6 +56,8 @@ app.use(cors())
 app.post('/', (req, res) => {
     res.send("Hello there!")
 })
+
+
 
 app.put('/book', (req, res) => {
 
@@ -65,7 +102,7 @@ app.post('/bookMultiple', async (req, res) => {
 
         //checking if the the whole row can be booked
         // if (seatNumber % 7 <= numSeats) {    
-            // seatNumber += seatNumber%7
+        // seatNumber += seatNumber%7
         // }
 
         const seatNumbersToReserve = Array.from({ length: numSeats }, (_, i) => seatNumber + i);
@@ -104,7 +141,7 @@ app.post('/cancelMultiple', async (req, res) => {
             return res.status(400).send("Not enough seats available");
         }
 
-       
+
 
         const seatNumbersToReserve = Array.from({ length: numSeats }, (_, i) => seatNumber + i);
 
@@ -142,6 +179,3 @@ app.get('/seats', (req, res) => {
 
 
 
-app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
-});
